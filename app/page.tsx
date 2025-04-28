@@ -105,7 +105,7 @@ export default function Home() {
                 Simple Pricing
               </h2>
               <p className="max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                Choose the plan that's right for you. No hidden fees, no surprises.
+                Choose the plan that&apos;s right for you. No hidden fees, no surprises.
               </p>
             </div>
           </div>
