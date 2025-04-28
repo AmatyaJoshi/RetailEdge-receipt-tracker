@@ -261,11 +261,11 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-1">
               <Shield className="h-6 w-6 text-blue-600" />
-              <span className="text-xl font-semibold">PayTrail</span>
+              <span className="text-xl font-semibold">RetailEdge</span>
             </div>
             <div className="mt-4 md:mt-0">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                PayTrail. The smarter way to track your receipts.
+                RetailEdge. The smarter way to track your receipts.
               </p>
             </div>
           </div>
