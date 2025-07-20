@@ -29,9 +29,6 @@ export default defineSchema({
       quantity: v.number(),
       unitPrice: v.number(),
       totalPrice: v.number(),
-    })),
-  
-    
-    
+    })),  
   })
 });

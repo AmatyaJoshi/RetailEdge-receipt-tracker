@@ -67,6 +67,12 @@ function PDFDropzone() {
                     throw new Error(result.error);
                 }
 
+                // Redirect to the receipt details page after successful upload
+                if (result.data && result.data.receiptId) {
+                    router.push(`/receipt/${result.data.receiptId}`);
+                    return; // Stop after first successful upload
+                }
+
                 newUploadedFiles.push(file.name);
 
                 setUploadedFiles((prev) => [...prev, ...newUploadedFiles]);

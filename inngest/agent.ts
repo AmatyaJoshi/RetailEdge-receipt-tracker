@@ -1,5 +1,5 @@
 import {
-    anthropic,
+    gemini,
     createNetwork,
     getDefaultRoutingAgent,
 } from "@inngest/agent-kit";
@@ -14,14 +14,9 @@ const agentNetwork = createNetwork({
     agents: [
         databaseAgent, receiptScanningAgent
     ],
-    defaultModel: anthropic({
-        model:"claude-3-5-sonnet-latest",
-        defaultParameters: {
-            max_tokens: 1000,
-        },
-    }),
+    // Removed defaultModel, handled in agents/tools directly
     defaultRouter: ({network}) => {
-        const savedToDatabase = network.state.kv.get("saved-to-database");
+        const savedToDatabase = network?.state.kv.get("saved-to-database");
 
         if (savedToDatabase !== undefined) {
             // Terminate the agent process if the data has been saved to the database
@@ -46,6 +41,6 @@ export const extractAndSavePDF = inngest.createFunction(
             receiptId: ${event.data.receiptId}. Once the receipt is successfully saved to the database you can terminate the agent
             process.`,
         );
-        return result.state.kv.get("receipt")
+        return await result.state.kv.get("receipt")
     }
 )

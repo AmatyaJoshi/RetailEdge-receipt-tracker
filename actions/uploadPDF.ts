@@ -60,6 +60,7 @@ export async function uploadPDF(formData: FormData) {
 
         // Get storage ID from response
         const { storageId } = await uploadResponse.json();
+        console.log("storageId:", storageId); // Log storageId
 
         // Add receipt to database
         const receiptId = await convex.mutation(api.receipts.storeReceipt, {
@@ -72,6 +73,7 @@ export async function uploadPDF(formData: FormData) {
 
         // Generate the file URL
         const fileUrl = await getFileDownloadUrl(storageId);
+        console.log("downloadUrl:", fileUrl.downloadUrl); // Log downloadUrl
 
         // TODO: Trigger inngest agent flow
         await inngest.send({

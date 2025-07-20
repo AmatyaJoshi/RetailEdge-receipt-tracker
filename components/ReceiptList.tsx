@@ -67,7 +67,7 @@ function ReceiptList() {
                     <TableBody>
                         {receipts.map((receipt: Doc<"receipts">) => (
                             <TableRow key={receipt._id} className="cursor-pointer hover:bg-gray-50"
-                                onClick={() => (router.push(`/receipts/${receipt._id}`))}
+                                onClick={() => (window.location.href = `/receipt/${receipt._id}`)}
                             >
                                 <TableCell className="py-2">
                                     <FileText className="w-6 h-6 text-red-500" />
@@ -87,10 +87,10 @@ function ReceiptList() {
                                 </TableCell>
                                 <TableCell>
                                     <span className={`px-2 py-1 rounded-full text-xs ${receipt.status === "pending"
-                                            ? "bg-yellow-100 text-yellow-800"
-                                            : receipt.status === "processed"
-                                                ? "bg-green-100 text-green-800"
-                                                : "bg-red-100 text-red-800"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : receipt.status === "processed"
+                                            ? "bg-green-100 text-green-800"
+                                            : "bg-red-100 text-red-800"
                                         }`}
                                     >
                                         {receipt.status.charAt(0).toUpperCase() + receipt.status.slice(1)}
