@@ -18,13 +18,19 @@ const parsePdfTool = createTool({
     }),
     handler: async ({ pdfUrl }, { step }) => {
         try {
+            console.log("[Gemini] PDF URL:", pdfUrl);
             // Download the PDF
             const pdfResponse = await axios.get(pdfUrl, { responseType: "arraybuffer" });
             const pdfData = Buffer.from(pdfResponse.data, "binary");
+            console.log("[Gemini] Downloaded PDF size:", pdfData.length, "bytes");
+            if (pdfData.length === 0) {
+                throw new Error("Downloaded PDF is empty. Check the file URL and storage.");
+            }
             const pdfBase64 = pdfData.toString("base64");
+            console.log("[Gemini] PDF base64 (first 100 chars):", pdfBase64.slice(0, 100));
 
-            // Dynamic prompt for robust extraction
-            const promptText = `Extract all structured data from this invoice or receipt PDF. Output a single JSON object.\n\n- For the summary, include all fields you can find, using the field names as they appear (e.g., Invoice Number, Date, Vendor, etc.).\n- For line items, output an array under the key 'items', with each item as an object containing all columns found (e.g., description, qty, price, amount, etc.).\n- If a field is missing, omit it.\n- Only output valid JSON.\n\nPDF:`;
+            // Simplified, robust prompt
+            const promptText = `Extract all text and tables from this invoice or receipt PDF. Output a single valid JSON object with all fields and line items you can find. Only output JSON.`;
 
             // Use Gemini's vision API to analyze the PDF and prompt
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
@@ -41,8 +47,7 @@ const parsePdfTool = createTool({
             });
             const geminiResponse = await result.response;
             const text = await geminiResponse.text();
-            // Log the raw output for debugging
-            console.log("Gemini raw output:", text);
+            console.log("[Gemini] Raw output:", text);
             // Try to parse as JSON
             let parsed;
             try {
@@ -53,14 +58,54 @@ const parsePdfTool = createTool({
                 if (match) {
                     try {
                         parsed = JSON.parse(match[0]);
-                        console.warn("Gemini output was not pure JSON, but extracted a valid object.");
+                        console.warn("[Gemini] Output was not pure JSON, but extracted a valid object.");
                     } catch (e2) {
-                        console.error("Gemini did not return valid JSON (even after extraction):", text);
-                        throw new Error("Gemini did not return valid JSON");
+                        console.error("[Gemini] Did not return valid JSON (even after extraction):", text);
+                        // Fallback: Try to extract just the raw text
+                        const fallbackPrompt = `Extract all text from this PDF and return as JSON: { \"text\": \"...\" }`;
+                        const fallbackResult = await model.generateContent({
+                            contents: [
+                                {
+                                    role: "user",
+                                    parts: [
+                                        { text: fallbackPrompt },
+                                        { inlineData: { mimeType: "application/pdf", data: pdfBase64 } }
+                                    ]
+                                }
+                            ]
+                        });
+                        const fallbackResponse = await fallbackResult.response;
+                        const fallbackText = await fallbackResponse.text();
+                        console.log("[Gemini] Fallback raw text output:", fallbackText);
+                        try {
+                            parsed = JSON.parse(fallbackText);
+                        } catch {
+                            parsed = { text: fallbackText };
+                        }
                     }
                 } else {
-                    console.error("Gemini did not return valid JSON:", text);
-                    throw new Error("Gemini did not return valid JSON");
+                    console.error("[Gemini] Did not return valid JSON:", text);
+                    // Fallback: Try to extract just the raw text
+                    const fallbackPrompt = `Extract all text from this PDF and return as JSON: { \"text\": \"...\" }`;
+                    const fallbackResult = await model.generateContent({
+                        contents: [
+                            {
+                                role: "user",
+                                parts: [
+                                    { text: fallbackPrompt },
+                                    { inlineData: { mimeType: "application/pdf", data: pdfBase64 } }
+                                ]
+                            }
+                        ]
+                    });
+                    const fallbackResponse = await fallbackResult.response;
+                    const fallbackText = await fallbackResponse.text();
+                    console.log("[Gemini] Fallback raw text output:", fallbackText);
+                    try {
+                        parsed = JSON.parse(fallbackText);
+                    } catch {
+                        parsed = { text: fallbackText };
+                    }
                 }
             }
             return parsed;
