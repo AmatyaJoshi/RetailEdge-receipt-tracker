@@ -174,6 +174,7 @@ export const updateReceiptWithExtractedData = mutation({
                 totalPrice: v.number(),
             }),
         ),
+        rawExtractedData: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         // Verify user has access to the receipt
@@ -194,6 +195,7 @@ export const updateReceiptWithExtractedData = mutation({
             receiptSummary: args.receiptSummary,
             items: args.items,
             status: "processed", // Mark as processed after data extraction
+            rawExtractedData: args.rawExtractedData,
         });
 
         return {

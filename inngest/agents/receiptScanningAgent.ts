@@ -23,8 +23,8 @@ const parsePdfTool = createTool({
             const pdfData = Buffer.from(pdfResponse.data, "binary");
             const pdfBase64 = pdfData.toString("base64");
 
-            // Improved prompt for reliable JSON extraction
-            const promptText = `Extract the following fields from this receipt PDF and return them as a single JSON object with these exact keys: merchantName, merchantAddress, merchantContact, transactionDate, transactionAmount, currency, receiptSummary, and items (an array of {name, quantity, unitPrice, totalPrice}). Only output valid JSON.\n\nPDF:`;
+            // Dynamic prompt for robust extraction
+            const promptText = `Extract all structured data from this invoice or receipt PDF. Output a single JSON object.\n\n- For the summary, include all fields you can find, using the field names as they appear (e.g., Invoice Number, Date, Vendor, etc.).\n- For line items, output an array under the key 'items', with each item as an object containing all columns found (e.g., description, qty, price, amount, etc.).\n- If a field is missing, omit it.\n- Only output valid JSON.\n\nPDF:`;
 
             // Use Gemini's vision API to analyze the PDF and prompt
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
@@ -48,8 +48,20 @@ const parsePdfTool = createTool({
             try {
                 parsed = JSON.parse(text);
             } catch (e) {
-                console.error("Gemini did not return valid JSON:", text);
-                throw new Error("Gemini did not return valid JSON");
+                // Try to extract the first valid JSON object from the text
+                const match = text.match(/\{[\s\S]*\}/);
+                if (match) {
+                    try {
+                        parsed = JSON.parse(match[0]);
+                        console.warn("Gemini output was not pure JSON, but extracted a valid object.");
+                    } catch (e2) {
+                        console.error("Gemini did not return valid JSON (even after extraction):", text);
+                        throw new Error("Gemini did not return valid JSON");
+                    }
+                } else {
+                    console.error("Gemini did not return valid JSON:", text);
+                    throw new Error("Gemini did not return valid JSON");
+                }
             }
             return parsed;
         } catch (error) {

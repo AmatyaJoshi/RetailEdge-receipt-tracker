@@ -15,6 +15,7 @@ export default defineSchema({
     size: v.number(),
     mimeType: v.string(),
     status: v.string(), // 'pending', 'processed', 'error'
+    rawExtractedData: v.optional(v.string()),
 
     // Fields for extracted data
     merchantName: v.optional(v.string()),

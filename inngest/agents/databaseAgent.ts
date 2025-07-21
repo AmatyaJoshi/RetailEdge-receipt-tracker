@@ -111,15 +111,16 @@ export async function saveToDatabaseWithGemini(receiptData: {
                 };
                 const updateResult = await convex.mutation(api.receipts.updateReceiptWithExtractedData, {
                     id: args.receiptId as Id<"receipts">,
-                    fileDisplayName: args.fileDisplayName,
-                    merchantName: args.merchantName,
-                    merchantAddress: args.merchantAddress,
-                    merchantContact: args.merchantContact,
-                    transactionDate: args.transactionDate,
-                    transactionAmount: args.transactionAmount,
-                    currency: args.currency,
+                    fileDisplayName: args.fileDisplayName || "",
+                    merchantName: args.merchantName || "",
+                    merchantAddress: args.merchantAddress || "",
+                    merchantContact: args.merchantContact || "",
+                    transactionDate: args.transactionDate || "",
+                    transactionAmount: args.transactionAmount || "",
+                    currency: args.currency || "",
                     receiptSummary: args.receiptSummary || "",
-                    items: args.items,
+                    items: Array.isArray(args.items) ? args.items : [],
+                    rawExtractedData: JSON.stringify(functionCall.args),
                 });
                 return { success: true, data: updateResult };
             } catch (dbErr) {

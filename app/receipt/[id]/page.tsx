@@ -141,6 +141,16 @@ function Receipt() {
         receipt.transactionAmount
     );
 
+    // Parse rawExtractedData if present
+    let dynamicData: Record<string, any> | null = null;
+    if (receipt.rawExtractedData) {
+        try {
+            dynamicData = JSON.parse(receipt.rawExtractedData);
+        } catch (e) {
+            dynamicData = null;
+        }
+    }
+
     return (
         <div className="container mx-auto py-10 px-4">
             <div className="max-w-4xl mx-auto">
@@ -355,6 +365,111 @@ function Receipt() {
                             </div>
                         )}
 
+                        {/* Dynamic Data Section */}
+                        {dynamicData && (
+                            <div className="mt-8">
+                                <h3 className="text-lg font-semibold mb-4">Extracted Data (AI)</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Render all fields except 'items' */}
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <h4 className="font-medium text-gray-700 mb-3">Summary Fields</h4>
+                                        <div className="space-y-2">
+                                            {Object.entries(dynamicData).filter(([k]) => k !== "items").map(([key, value]) => (
+                                                <div key={key}>
+                                                    <p className="text-sm text-gray-500">{key}</p>
+                                                    <p className="font-medium">{String(value)}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Render items if present */}
+                                    {Array.isArray(dynamicData.items) && dynamicData.items.length > 0 && (
+                                        <div className="bg-gray-50 p-4 rounded-lg">
+                                            <h4 className="font-medium text-gray-700 mb-3">Items</h4>
+                                            <div className="overflow-x-auto">
+                                                <Table>
+                                                    <TableHeader>
+                                                        <TableRow>
+                                                            {Object.keys(dynamicData.items[0]).map((col) => (
+                                                                <TableHead key={col}>{col}</TableHead>
+                                                            ))}
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {dynamicData.items.map((item, idx) => (
+                                                            <TableRow key={idx}>
+                                                                {Object.values(item).map((val, i) => (
+                                                                    <TableCell key={i}>{String(val)}</TableCell>
+                                                                ))}
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                        {/* Fallback to fixed fields if no dynamic data */}
+                        {!dynamicData && (
+                            <div className="mt-8">
+                                <h3 className="text-lg font-semibold mb-4">Receipt Details</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Merchant Details */}
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <h4 className="font-medium text-gray-700 mb-3">
+                                            Merchant Information
+                                        </h4>
+                                        <div className="space-y-2">
+                                            {receipt.merchantName && (
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Name</p>
+                                                    <p className="font-medium">{receipt.merchantName}</p>
+                                                </div>
+                                            )}
+                                            {receipt.merchantAddress && (
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Address</p>
+                                                    <p className="font-medium">{receipt.merchantAddress}</p>
+                                                </div>
+                                            )}
+                                            {receipt.merchantContact && (
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Contact</p>
+                                                    <p className="font-medium">{receipt.merchantContact}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {/* Transaction Details */}
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <h4 className="font-medium text-gray-700 mb-3">
+                                            Transaction Details
+                                        </h4>
+                                        <div className="space-y-2">
+                                            {receipt.transactionDate && (
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Date</p>
+                                                    <p className="font-medium">
+                                                        {receipt.transactionDate}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {receipt.transactionAmount && (
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Amount</p>
+                                                    <p className="font-medium">
+                                                        {receipt.transactionAmount}{receipt.currency || ""}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Items Section */}
                         {receipt.items && receipt.items.length > 0 && (
                             <div className="mt-6">
@@ -442,14 +557,10 @@ function Receipt() {
 export default Receipt;
 
 // Helper function to format file size
-function formatFileSize(bytes: number): string {
-    if (bytes === 0) return "0 Bytes";
-
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+function formatFileSize(size: number): string {
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(2)} MB`;
 }
 
 // Helper function to format currency
