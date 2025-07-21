@@ -90,9 +90,42 @@ export async function saveToDatabaseWithGemini(receiptData: {
         const response = await result.response;
         const functionCall = response.functionCall && response.functionCall();
         if (functionCall && functionCall.name === "save-to-database") {
-            // You can add your DB logic here, or trigger a Convex mutation, etc.
-            console.log("Gemini function call args:", functionCall.args);
-            return { success: true, data: functionCall.args };
+            // Actually save to Convex DB
+            try {
+                const args = functionCall.args as {
+                    receiptId: string;
+                    fileDisplayName: string;
+                    merchantName: string;
+                    merchantAddress: string;
+                    merchantContact: string;
+                    transactionDate: string;
+                    transactionAmount: string;
+                    currency: string;
+                    receiptSummary?: string;
+                    items: Array<{
+                        name: string;
+                        quantity: number;
+                        unitPrice: number;
+                        totalPrice: number;
+                    }>;
+                };
+                const updateResult = await convex.mutation(api.receipts.updateReceiptWithExtractedData, {
+                    id: args.receiptId as Id<"receipts">,
+                    fileDisplayName: args.fileDisplayName,
+                    merchantName: args.merchantName,
+                    merchantAddress: args.merchantAddress,
+                    merchantContact: args.merchantContact,
+                    transactionDate: args.transactionDate,
+                    transactionAmount: args.transactionAmount,
+                    currency: args.currency,
+                    receiptSummary: args.receiptSummary || "",
+                    items: args.items,
+                });
+                return { success: true, data: updateResult };
+            } catch (dbErr) {
+                console.error("Convex DB update error:", dbErr);
+                return { success: false, message: "Failed to update receipt in database." };
+            }
         } else {
             console.error("No function call detected or unexpected function:", response.text());
             return { success: false, message: response.text() || "Could not save data." };
