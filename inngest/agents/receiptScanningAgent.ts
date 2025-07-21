@@ -23,14 +23,8 @@ const parsePdfTool = createTool({
             const pdfData = Buffer.from(pdfResponse.data, "binary");
             const pdfBase64 = pdfData.toString("base64");
 
-            const promptText = `Extract the data from this receipt PDF and return the structured output as follows:
-            {
-                "merchant": { "name": "Store Name", "address": "123 Main St, City, Country", "contact": "+123456789" },
-                "transaction": { "date": "DD-MM-YYYY", "time": "HH:MM", "receipt_number": "ABC123456", "payment_method": "Credit Card" },
-                "items": [ { "name": "Item 1", "quantity": 2, "unit_price": 10.00, "total_price": 20.00 } ],
-                "totals": { "subtotal": 30.00, "tax": 3.00, "total": 33.00, "currency": "INR" }
-            }
-            `;
+            // Improved prompt for reliable JSON extraction
+            const promptText = `Extract the following fields from this receipt PDF and return them as a single JSON object with these exact keys: merchantName, merchantAddress, merchantContact, transactionDate, transactionAmount, currency, receiptSummary, and items (an array of {name, quantity, unitPrice, totalPrice}). Only output valid JSON.\n\nPDF:`;
 
             // Use Gemini's vision API to analyze the PDF and prompt
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
@@ -47,7 +41,17 @@ const parsePdfTool = createTool({
             });
             const geminiResponse = await result.response;
             const text = await geminiResponse.text();
-            return { model: "gemini-2.5-pro", data: text };
+            // Log the raw output for debugging
+            console.log("Gemini raw output:", text);
+            // Try to parse as JSON
+            let parsed;
+            try {
+                parsed = JSON.parse(text);
+            } catch (e) {
+                console.error("Gemini did not return valid JSON:", text);
+                throw new Error("Gemini did not return valid JSON");
+            }
+            return parsed;
         } catch (error) {
             console.error("[Gemini] Error from Gemini SDK:", error);
             throw error;
