@@ -45,12 +45,10 @@ const saveToDatabaseTool = createTool({
                     unitPrice: z.number(),
                     totalPrice: z.number(),
                 })
-                .strict()
-                .describe(
-                    "An array of items on the receipt. Include the name, quantity, unit price, and total price for each item."
-                ),
+        ).describe(
+            "An array of items on the receipt. Include the name, quantity, unit price, and total price for each item."
         ),
-    }).strict(),
+    }),
     handler: async (params, context) => {
         let {
             fileDisplayName,
