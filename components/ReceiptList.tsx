@@ -12,7 +12,6 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Doc } from "@/convex/_generated/dataModel";
-import { useRouter } from "next/navigation";
 import { FileText, ChevronRight } from "lucide-react";
 
 function ReceiptList() {
