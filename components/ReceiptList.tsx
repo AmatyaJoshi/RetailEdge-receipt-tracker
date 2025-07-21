@@ -20,7 +20,7 @@ function ReceiptList() {
     const receipts = useQuery(api.receipts.getReceipts, {
         userId: user?.id || "",
     });
-    const router = useRouter();
+    // const router = useRouter(); // Removed unused variable
 
     if (!user) {
         return (
