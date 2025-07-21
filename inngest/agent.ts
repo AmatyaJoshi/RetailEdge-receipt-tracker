@@ -21,7 +21,6 @@ const defaultModel = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 const agentNetwork = createNetwork({
     name: "Agent Team",
     agents: [
-        // databaseAgent, // Remove from network
         receiptScanningAgent
     ],
     defaultModel: gemini({
@@ -29,13 +28,10 @@ const agentNetwork = createNetwork({
         apiKey: process.env.GEMINI_API_KEY,
     }),
     defaultRouter: ({network}) => {
-        const savedToDatabase = network?.state.kv.get("saved-to-database");
-
-        if (savedToDatabase !== undefined) {
-            // Terminate the agent process if the data has been saved to the database
-            return undefined;
+        // Only run the agent once per event
+        if (network.state.results.length > 0) {
+            return undefined; // Terminate after first run
         }
-
         return getDefaultRoutingAgent();
     }
 })
