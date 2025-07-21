@@ -1,5 +1,4 @@
 import {
-    gemini,
     createNetwork,
     getDefaultRoutingAgent,
 } from "@inngest/agent-kit";
