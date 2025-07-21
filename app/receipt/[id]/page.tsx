@@ -142,11 +142,11 @@ function Receipt() {
     );
 
     // Parse rawExtractedData if present
-    let dynamicData: Record<string, any> | null = null;
+    let dynamicData: Record<string, unknown> | null = null;
     if (receipt.rawExtractedData) {
         try {
             dynamicData = JSON.parse(receipt.rawExtractedData);
-        } catch (e) {
+        } catch {
             dynamicData = null;
         }
     }
