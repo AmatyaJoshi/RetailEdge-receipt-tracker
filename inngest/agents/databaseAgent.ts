@@ -160,4 +160,8 @@ export const databaseAgent = createAgent({
     system:
         "You are a helpful assistant that takes key information regarding receipts and saves it to the convex database.",
     tools: [saveToDatabaseTool],
+    model: require("@inngest/agent-kit").gemini({
+        model: "gemini-2.5-pro",
+        apiKey: process.env.GEMINI_API_KEY,
+    }),
 });

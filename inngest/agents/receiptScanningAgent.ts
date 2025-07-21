@@ -71,5 +71,9 @@ export const receiptScanningAgent = createAgent({
         •   Handle multiple formats, languages, and varying receipt layouts efficiently.
         •   Maintain a structured JSON output for easy integration with databases or expense tracking systems.
     `,
-    tools: [parsePdfTool]
+    tools: [parsePdfTool],
+    model: require("@inngest/agent-kit").gemini({
+        model: "gemini-2.5-pro",
+        apiKey: process.env.GEMINI_API_KEY,
+    }),
 });
