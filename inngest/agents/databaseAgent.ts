@@ -38,13 +38,12 @@ const saveToDatabaseTool = createTool({
         ),
         currency: z.string(),
         items: z.array(
-            z.
-                object({
-                    name: z.string(),
-                    quantity: z.number(),
-                    unitPrice: z.number(),
-                    totalPrice: z.number(),
-                })
+            z.object({
+                name: z.string(),
+                quantity: z.number(),
+                unitPrice: z.number(),
+                totalPrice: z.number(),
+            })
         ).describe(
             "An array of items on the receipt. Include the name, quantity, unit price, and total price for each item."
         ),
