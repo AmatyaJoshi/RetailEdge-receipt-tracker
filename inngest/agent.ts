@@ -1,19 +1,31 @@
 import {
     createNetwork,
     getDefaultRoutingAgent,
+    gemini,
 } from "@inngest/agent-kit";
 import { createServer } from "@inngest/agent-kit/server";
 import { inngest } from "./client";
 import Events from "./constants";
 import { databaseAgent } from "./agents/databaseAgent";
 import { receiptScanningAgent } from "./agents/receiptScanningAgent";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const geminiApiKey = process.env.GEMINI_API_KEY;
+if (!geminiApiKey) {
+    throw new Error("GEMINI_API_KEY is not set in environment variables");
+}
+const genAI = new GoogleGenerativeAI(geminiApiKey);
+const defaultModel = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
 const agentNetwork = createNetwork({
     name: "Agent Team",
     agents: [
         databaseAgent, receiptScanningAgent
     ],
-    // Removed defaultModel, handled in agents/tools directly
+    defaultModel: gemini({
+        model: "gemini-2.5-pro",
+        apiKey: process.env.GEMINI_API_KEY,
+    }),
     defaultRouter: ({network}) => {
         const savedToDatabase = network?.state.kv.get("saved-to-database");
 
