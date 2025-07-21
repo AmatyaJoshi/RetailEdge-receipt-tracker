@@ -51,18 +51,13 @@ export const extractAndSavePDF = inngest.createFunction(
     async ({event}) => {
         // Step 1: Run the agent network to extract data from the PDF
         const result = await agentNetwork.run(
-            `Extract the key data from this pdf: ${event.data.url}. Once the data is extracted, save it to the database using the
-            receiptId: ${event.data.receiptId}. Once the receipt is successfully saved to the database you can terminate the agent
-            process.`,
+            `Extract the key data from this pdf: ${event.data.url}. Return the extracted data as JSON.`,
         );
         // Step 2: Parse the extracted data from the agent result
-        // (Assume the agent returns the extracted data as JSON in result.state.kv.get("extractedData") or similar)
         let extractedData;
         try {
-            // You may need to adjust this depending on how your agent returns the data
             const lastResult = result.state?.results?.[result.state?.results?.length - 1];
             if (lastResult && lastResult.output && lastResult.output.length > 0) {
-                // Try to parse JSON from the last output
                 const text = lastResult.output.map((msg: any) => msg.content).join("\n");
                 extractedData = JSON.parse(text);
             } else {
@@ -80,7 +75,6 @@ export const extractAndSavePDF = inngest.createFunction(
         // Step 4: Update agent network state to indicate save is complete
         if (result.state && result.state.kv) {
             result.state.kv.set("saved-to-database", true);
-            // Use receiptId from saveResult.data if present, else fallback to event.data.receiptId
             const receiptId = (saveResult.success && saveResult.data && typeof saveResult.data === "object" && "receiptId" in saveResult.data)
                 ? (saveResult.data as any).receiptId
                 : event.data.receiptId;
