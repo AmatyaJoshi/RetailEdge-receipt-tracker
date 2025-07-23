@@ -63,7 +63,25 @@ export const extractAndSavePDF = inngest.createFunction(
     {id: "Extract PDF and Save in Database"},
     {event: Events.EXTRACT_DATA_FROM_PDF_AND_SAVE_TO_DATABASE},
     async ({event}) => {
-        // Step 1: Run the agent network to extract data from the PDF
+        // Step 1: Get receipt information from database to access fileName
+        const { ConvexHttpClient } = await import("convex/browser");
+        const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+        
+        let receiptInfo;
+        try {
+            const { api } = await import("@/convex/_generated/api");
+            receiptInfo = await convex.query(api.receipts.getReceiptById, { id: event.data.receiptId });
+        } catch (err) {
+            console.error('[Gemini] Error fetching receipt info:', err);
+            return { error: "Failed to fetch receipt information." };
+        }
+
+        if (!receiptInfo) {
+            console.error('[Gemini] Receipt not found:', event.data.receiptId);
+            return { error: "Receipt not found." };
+        }
+
+        // Step 2: Run the agent network to extract data from the PDF
         const result = await agentNetwork.run(
             `Extract the key data from this pdf: ${event.data.url}. Return the extracted data as JSON.`,
         );
@@ -72,7 +90,6 @@ export const extractAndSavePDF = inngest.createFunction(
         try {
             const lastResult = result.state?.results?.[result.state?.results?.length - 1];
             if (lastResult && lastResult.output) {
-                let extractedData;
                 if (typeof lastResult.output === "string") {
                     // If output is a string, clean and parse
                     const cleanedText = extractJsonFromCodeBlock(lastResult.output);
@@ -87,12 +104,36 @@ export const extractAndSavePDF = inngest.createFunction(
             } else {
                 throw new Error("No extracted data found in agent output");
             }
+            
+            console.log('[Gemini] Raw output:', extractedData);
         } catch (err) {
             console.error("Failed to parse extracted data from agent output:", err);
             return { error: "Failed to extract data from receipt." };
         }
+        // Step 2.5: Map Gemini output to expected format
+        function mapGeminiToExpectedFormat(geminiData: any) {
+            return {
+                merchantName: geminiData?.issuer?.name || geminiData?.merchant_name || '',
+                merchantAddress: geminiData?.merchant_address || geminiData?.issuer?.address || '',
+                merchantContact: geminiData?.merchant_contact || geminiData?.merchant_phone || '',
+                transactionDate: geminiData?.date_issued || geminiData?.transaction_date || geminiData?.date || '',
+                transactionAmount: geminiData?.grand_total?.toString() || geminiData?.total_amount?.toString() || geminiData?.amount?.toString() || '',
+                currency: geminiData?.currency || '$',
+                receiptSummary: `Receipt from ${geminiData?.issuer?.name || 'Unknown'} dated ${geminiData?.date_issued || 'Unknown'}`,
+                items: (geminiData?.line_items || []).map((item: any) => ({
+                    name: item?.description || '',
+                    quantity: item?.qty || 1,
+                    unitPrice: item?.price || 0,
+                    totalPrice: item?.subtotal || 0,
+                })),
+            };
+        }
+
+        // Map the extracted data to expected format
+        const mappedData = mapGeminiToExpectedFormat(extractedData);
+
         // Step 3: Enhanced normalization and validation before saving
-        function normalizeReceiptData(data: any, receiptId: string) {
+        function normalizeReceiptData(data: any, receiptId: string, fileDisplayName: string, originalData: any) {
             // List of required fields (typed)
             const requiredFields: Array<keyof typeof normalized> = [
                 'fileDisplayName', 'merchantName', 'merchantAddress', 'merchantContact',
@@ -119,7 +160,7 @@ export const extractAndSavePDF = inngest.createFunction(
             };
             // Build normalized object
             const normalized = {
-                fileDisplayName: toString(data.fileDisplayName),
+                fileDisplayName: fileDisplayName, // Use the passed fileDisplayName instead of data.fileDisplayName
                 receiptId,
                 merchantName: toString(data.merchantName),
                 merchantAddress: toString(data.merchantAddress),
@@ -129,7 +170,7 @@ export const extractAndSavePDF = inngest.createFunction(
                 receiptSummary: toString(data.receiptSummary),
                 currency: toString(data.currency),
                 items: toItems(data.items),
-                rawExtractedData: JSON.stringify(data),
+                rawExtractedData: JSON.stringify(originalData), // Use the original Gemini data
             };
             // Log missing required fields
             const missing = requiredFields.filter(f => {
@@ -151,7 +192,7 @@ export const extractAndSavePDF = inngest.createFunction(
         }
         let normalizedData;
         try {
-            normalizedData = normalizeReceiptData(extractedData, event.data.receiptId);
+            normalizedData = normalizeReceiptData(mappedData, event.data.receiptId, receiptInfo.fileName, extractedData);
         } catch (err) {
             console.error('[Gemini] Normalization error:', err);
             return { error: 'Failed to extract any usable receipt data.' };
