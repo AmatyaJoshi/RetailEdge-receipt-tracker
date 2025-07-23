@@ -58,6 +58,17 @@ export const getReceipts = query({
     },
 })
 
+// Internal function to get receipt by ID without auth (for server-side operations)
+export const getReceiptByIdInternal = query({
+    args: {
+        id: v.id("receipts"),
+    },
+    handler: async (ctx, args) => {
+        // Get the receipt without auth check (for internal server operations)
+        return await ctx.db.get(args.id);
+    },
+});
+
 // Function to get a single receipt by ID
 export const getReceiptById = query({
     args: {

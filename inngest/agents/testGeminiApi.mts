@@ -69,11 +69,7 @@ async function testGeminiApi() {
                         { text: `Respond with a JSON object for a sample invoice/receipt. Use the following fields: invoice_id (string), date_issued (string), issued_to (object: name, address), line_items (array of objects: no, description, qty, price, subtotal), grand_total (number), currency (string), note (object: bank_name, account_no), issuer (object: name, title).` }
                     ]
                 }
-            ],
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: receiptSchema
-            }
+            ]
         });
         const geminiResponse = await result.response;
         const text = await geminiResponse.text();

@@ -1,5 +1,5 @@
 import { createAgent, createTool } from "@inngest/agent-kit";
-import { GoogleGenerativeAI, SchemaType, Schema } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z } from "zod";
 import axios from "axios";
 
@@ -29,62 +29,19 @@ const parsePdfTool = createTool({
             const pdfBase64 = pdfData.toString("base64");
             console.log("[Gemini] PDF base64 (first 100 chars):", pdfBase64.slice(0, 100));
 
-            // Flexible schema for receipts with optional fields and additional properties
-            const flexibleReceiptSchema: Schema = {
-                type: SchemaType.OBJECT,
-                properties: {
-                    invoice_id: { type: SchemaType.STRING, nullable: true },
-                    date_issued: { type: SchemaType.STRING, nullable: true },
-                    issued_to: {
-                        type: SchemaType.OBJECT,
-                        properties: {
-                            name: { type: SchemaType.STRING, nullable: true },
-                            address: { type: SchemaType.STRING, nullable: true }
-                        },
-                        required: [],
-                        nullable: true
-                    },
-                    line_items: {
-                        type: SchemaType.ARRAY,
-                        items: {
-                            type: SchemaType.OBJECT,
-                            properties: {
-                                no: { type: SchemaType.INTEGER, nullable: true },
-                                description: { type: SchemaType.STRING, nullable: true },
-                                qty: { type: SchemaType.INTEGER, nullable: true },
-                                price: { type: SchemaType.NUMBER, nullable: true },
-                                subtotal: { type: SchemaType.NUMBER, nullable: true }
-                            },
-                            required: [],
-                            nullable: true
-                        },
-                        nullable: true
-                    },
-                    grand_total: { type: SchemaType.NUMBER, nullable: true },
-                    currency: { type: SchemaType.STRING, nullable: true },
-                    note: {
-                        type: SchemaType.OBJECT,
-                        properties: {
-                            bank_name: { type: SchemaType.STRING, nullable: true },
-                            account_no: { type: SchemaType.STRING, nullable: true }
-                        },
-                        required: [],
-                        nullable: true
-                    },
-                    issuer: {
-                        type: SchemaType.OBJECT,
-                        properties: {
-                            name: { type: SchemaType.STRING, nullable: true },
-                            title: { type: SchemaType.STRING, nullable: true }
-                        },
-                        required: [],
-                        nullable: true
-                    }
-                },
-                required: [], // No required fields
-                nullable: true
-            };
-            const promptText = `Extract all available key-value pairs and arrays from this receipt PDF. Return a single valid JSON object. If some fields are missing or extra, include whatever is present. Do not fail if some fields are missing. Use best effort to extract all structured data.`;
+            const promptText = `Extract all available key-value pairs and arrays from this receipt PDF. Return a single valid JSON object with the following structure (include only fields that are present, skip missing ones):
+{
+  "invoice_id": "string or null",
+  "date_issued": "string or null", 
+  "issued_to": {"name": "string", "address": "string"},
+  "line_items": [{"no": number, "description": "string", "qty": number, "price": number, "subtotal": number}],
+  "grand_total": number,
+  "currency": "string",
+  "note": {"bank_name": "string", "account_no": "string"},
+  "issuer": {"name": "string", "title": "string"}
+}
+Use best effort to extract all structured data. Return only the JSON object, no additional text.`;
+            
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
             const result = await model.generateContent({
                 contents: [
@@ -95,17 +52,29 @@ const parsePdfTool = createTool({
                             { inlineData: { mimeType: "application/pdf", data: pdfBase64 } }
                         ]
                     }
-                ],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: flexibleReceiptSchema
-                }
+                ]
             });
             const geminiResponse = await result.response;
             const text = await geminiResponse.text();
             console.log("[Gemini] Raw output:", text);
-            // Output is guaranteed to be valid JSON (may have missing or extra fields)
-            return JSON.parse(text);
+            
+            // Clean the response text and parse JSON
+            let cleanedText = text.trim();
+            
+            // Remove markdown code blocks if present
+            const codeBlockMatch = cleanedText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+            if (codeBlockMatch && codeBlockMatch[1]) {
+                cleanedText = codeBlockMatch[1].trim();
+            }
+            
+            // Try to parse as JSON
+            try {
+                return JSON.parse(cleanedText);
+            } catch (parseError) {
+                console.error("[Gemini] Failed to parse JSON response:", parseError);
+                console.error("[Gemini] Raw text:", text);
+                throw new Error("Failed to parse Gemini response as JSON");
+            }
         } catch (error) {
             console.error("[Gemini] Error from Gemini SDK:", error);
             throw error;

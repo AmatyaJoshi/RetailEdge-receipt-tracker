@@ -80,8 +80,7 @@ export async function saveToDatabaseWithGemini(receiptData: {
                 {
                     role: "user",
                     parts: [
-                        { text: "Save this receipt data to the database." },
-                        { inlineData: { mimeType: "application/json", data: Buffer.from(JSON.stringify(receiptData)).toString("base64") } }
+                        { text: `Save this receipt data to the database: ${JSON.stringify(receiptData)}` }
                     ]
                 }
             ],
