@@ -41,6 +41,12 @@ export const server = createServer({
     networks: [agentNetwork],
 });
 
+// Utility to clean code block markers from Gemini output
+function extractJsonFromCodeBlock(text: string): string {
+    // Remove triple backticks and optional language tag (e.g., ```json)
+    return text.replace(/```json|```/g, '').trim();
+}
+
 export const extractAndSavePDF = inngest.createFunction(
     {id: "Extract PDF and Save in Database"},
     {event: Events.EXTRACT_DATA_FROM_PDF_AND_SAVE_TO_DATABASE},
@@ -55,7 +61,8 @@ export const extractAndSavePDF = inngest.createFunction(
             const lastResult = result.state?.results?.[result.state?.results?.length - 1];
             if (lastResult && lastResult.output && lastResult.output.length > 0) {
                 const text = lastResult.output.map((msg: any) => msg.content).join("\n");
-                extractedData = JSON.parse(text);
+                const cleanedText = extractJsonFromCodeBlock(text);
+                extractedData = JSON.parse(cleanedText);
             } else {
                 throw new Error("No extracted data found in agent output");
             }
