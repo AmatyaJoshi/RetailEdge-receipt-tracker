@@ -43,12 +43,19 @@ export const server = createServer({
 
 // Utility to clean code block markers from Gemini output
 function extractJsonFromCodeBlock(text: string): string {
-    // Extract content between the first pair of triple backticks, if present
+    // Log the raw text for debugging
+    console.log('[Gemini] Raw text before cleaning:', JSON.stringify(text));
+    // Try to extract content between triple backticks (with or without 'json')
     const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-    if (match) {
+    if (match && match[1]) {
         return match[1].trim();
     }
-    // Fallback: remove any stray backticks and trim
+    // Fallback: try to extract the first JSON object in the text
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+        return jsonMatch[0].trim();
+    }
+    // Final fallback: remove stray backticks and trim
     return text.replace(/```json|```/g, '').trim();
 }
 
