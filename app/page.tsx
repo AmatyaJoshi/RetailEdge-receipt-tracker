@@ -9,14 +9,10 @@ import {
   Check,
   BadgeCheck,
   Clock3,
-  Layers3,
   Receipt,
-  ScanLine,
   Shield,
-  ShieldCheck,
   Sparkles,
   UploadCloud,
-  Wand2,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
