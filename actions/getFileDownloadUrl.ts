@@ -1,7 +1,7 @@
 "use server";
 
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import type { Id } from "@/convex/_generated/dataModel";
 import convex from "@/lib/convexClient";
 
 // Server action to get a download URL for a file in Convex Storage

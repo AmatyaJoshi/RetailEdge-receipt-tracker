@@ -2,7 +2,7 @@
 
 import convex from "@/lib/convexClient";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import type { Id } from "../convex/_generated/dataModel";
 
 /**
  * Server action to delete a receipt

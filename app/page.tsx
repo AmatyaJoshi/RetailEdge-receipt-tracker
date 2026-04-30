@@ -2,387 +2,332 @@
 
 import PDFDropzone from "@/components/PDFDropzone";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart, Check, Search, Shield, Upload, Sparkles, Zap, TrendingUp, Users, Globe, Lock, Database, Cpu, BarChart3 } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BarChart3,
+  Check,
+  BadgeCheck,
+  Clock3,
+  Layers3,
+  Receipt,
+  ScanLine,
+  Shield,
+  ShieldCheck,
+  Sparkles,
+  UploadCloud,
+  Wand2,
+} from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useEffect, useRef } from "react";
 
 export default function Home() {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
-      
-      const { clientX, clientY } = e;
-      const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-      
-      const x = (clientX - left) / width;
-      const y = (clientY - top) / height;
-      
-      containerRef.current.style.setProperty('--mouse-x', `${x}`);
-      containerRef.current.style.setProperty('--mouse-y', `${y}`);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
   const fadeInUp = {
-    initial: { opacity: 0, y: 60 },
+    initial: { opacity: 0, y: 16 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6, ease: "easeOut" }
+    transition: { duration: 0.45, ease: "easeOut" },
   };
 
   const staggerContainer = {
     animate: {
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.08,
+      },
+    },
   };
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden" ref={containerRef}>
-      {/* Professional Animated Background */}
-      <div className="fixed inset-0 -z-10">
-        {/* Base gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
-        
-        {/* Subtle mesh gradient overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_var(--mouse-x,_0.5)_var(--mouse-y,_0.5),_rgba(30,64,175,0.15)_0%,_transparent_50%)]" />
-        
-        {/* Professional pattern overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%233B82F6%22%20fill-opacity%3D%220.03%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%221.5%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
-        
-        {/* Subtle grid lines */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-blue-600/5" />
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-600/5 via-transparent to-blue-600/5" />
+    <div className="min-h-screen overflow-hidden bg-[#f4f5f7] text-slate-950">
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute left-[-10%] top-[-10%] h-72 w-72 rounded-full bg-slate-950/5 blur-3xl" />
+        <div className="absolute right-[-8%] top-[18%] h-96 w-96 rounded-full bg-sky-400/10 blur-3xl" />
+        <div className="absolute bottom-[-12%] left-[24%] h-80 w-80 rounded-full bg-indigo-400/10 blur-3xl" />
       </div>
 
-      {/* Hero Section */}
-      <section className="relative py-16 md:py-24 min-h-screen flex items-center">
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <motion.div 
-            className="flex flex-col items-center space-y-6 text-center"
+      <section className="container mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+          <motion.div
             initial="initial"
             animate="animate"
             variants={staggerContainer}
+            className="space-y-8"
           >
+            <motion.div
+              variants={fadeInUp}
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/85 px-4 py-2 text-sm text-slate-600 shadow-[0_10px_30px_rgba(15,23,42,0.05)] backdrop-blur"
+            >
+              <Sparkles className="h-4 w-4 text-slate-900" />
+              Receipt workspace for modern teams
+            </motion.div>
 
-            {/* Main Heading */}
-            <motion.div className="space-y-4 max-w-5xl" variants={fadeInUp}>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white">
-                Intelligent Receipt
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
-                  Processing Platform
-                </span>
+            <motion.div variants={fadeInUp} className="space-y-4 max-w-2xl">
+              <h1 className="max-w-xl text-4xl font-semibold tracking-tight text-slate-950 md:text-5xl lg:text-6xl">
+                A cleaner way to upload, read, and review receipts.
               </h1>
-              <p className="mx-auto max-w-3xl text-xl md:text-2xl text-slate-300 leading-relaxed">
-                Transform your expense management with enterprise-grade AI technology. 
-                <span className="font-semibold text-white"> Process, analyze, and extract</span> data from receipts with unmatched accuracy and speed.
+              <p className="max-w-xl text-base leading-7 text-slate-600 md:text-lg">
+                Capture documents in one place, surface the important details instantly, and keep the review flow polished enough to feel like a real product experience.
               </p>
             </motion.div>
 
-
-
-            {/* CTA Buttons */}
-            <motion.div className="flex flex-col sm:flex-row gap-6 items-center mt-12" variants={fadeInUp}>
+            <motion.div variants={fadeInUp} className="flex flex-wrap gap-3">
               <Link href="/receipts">
-                <Button className="group relative px-10 py-4 text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 border border-blue-500/20">
-                  Start Processing
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                <Button className="rounded-full bg-slate-950 px-6 text-white shadow-lg shadow-slate-950/10 hover:bg-slate-800">
+                  View receipts
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="#features">
-                <Button variant="outline" className="px-10 py-4 text-lg font-semibold border-2 border-slate-600 text-slate-300 hover:bg-slate-800 hover:border-slate-500 rounded-xl transition-all duration-300 backdrop-blur-sm">
-                  View Capabilities
+              <Link href="#upload">
+                <Button
+                  variant="outline"
+                  className="rounded-full border-slate-200 bg-white px-6 text-slate-700 hover:bg-slate-50"
+                >
+                  Upload a PDF
                 </Button>
               </Link>
             </motion.div>
 
-            {/* Enterprise Stats */}
-            <motion.div className="flex flex-wrap justify-center gap-12 mt-16" variants={fadeInUp}>
+            <motion.div variants={fadeInUp} className="grid gap-3 sm:grid-cols-3">
+              {["Fast upload", "Readable summaries", "Convex sync"].map((item) => (
+                <div key={item} className="surface-card px-4 py-3 text-sm text-slate-600">
+                  {item}
+                </div>
+              ))}
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="grid gap-3 sm:grid-cols-3">
               {[
-                { number: "99.9%", label: "Accuracy Rate", icon: Shield },
-                { number: "10M+", label: "Documents Processed", icon: Database },
-                { number: "24/7", label: "AI Processing", icon: Cpu },
-                { number: "500+", label: "Enterprise Clients", icon: Users }
-              ].map((stat, index) => (
-                <div key={index} className="text-center group">
-                  <div className="w-16 h-16 bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-600 group-hover:border-blue-500 transition-colors duration-300">
-                    <stat.icon className="w-8 h-8 text-blue-400" />
-                  </div>
-                  <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
-                  <div className="text-sm text-slate-400">{stat.label}</div>
+                "Upload",
+                "Process",
+                "Review",
+              ].map((step, index) => (
+                <div key={step} className="surface-card p-4">
+                  <div className="text-sm font-semibold text-slate-950">0{index + 1}</div>
+                  <div className="mt-1 text-sm text-slate-600">{step}</div>
                 </div>
               ))}
             </motion.div>
           </motion.div>
-        </div>
 
-        {/* Professional Floating Elements */}
-        <motion.div 
-          className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.2, 0.4, 0.2]
-          }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
-        <motion.div 
-          className="absolute bottom-20 left-10 w-40 h-40 bg-gradient-to-br from-slate-600/20 to-blue-600/20 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1.2, 1, 1.2],
-            opacity: [0.3, 0.5, 0.3]
-          }}
-          transition={{ duration: 8, repeat: Infinity, delay: 2 }}
-        />
-      </section>
-
-
-
-      {/* Enterprise Features Section */}
-      <section id="features" className="py-24 relative z-10">
-        <div className="container mx-auto px-4 md:px-6">
-          <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Enterprise-Grade
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
-                Capabilities
-              </span>
-            </h2>
-            <p className="max-w-3xl mx-auto text-xl text-slate-300">
-              Built for scale, security, and performance. Trusted by Fortune 500 companies worldwide.
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-            variants={staggerContainer}
+          <motion.div
+            id="upload"
+            variants={fadeInUp}
             initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
+            animate="animate"
+            className="surface-card border-white/60 bg-white/90 p-4 shadow-[0_25px_80px_rgba(15,23,42,0.08)] backdrop-blur md:p-6"
           >
-            {[
-              {
-                icon: Upload,
-                title: "Advanced OCR Processing",
-                description: "State-of-the-art optical character recognition with 99.9% accuracy across all document types and formats.",
-                color: "from-blue-500 to-blue-600",
-                bgColor: "from-slate-800/80 to-slate-700/80"
-              },
-              {
-                icon: Search,
-                title: "AI-Powered Analysis",
-                description: "Machine learning algorithms that automatically categorize, tag, and extract relevant financial data from receipts.",
-                color: "from-cyan-500 to-cyan-600",
-                bgColor: "from-slate-800/80 to-slate-700/80"
-              },
-              {
-                icon: BarChart3,
-                title: "Business Intelligence",
-                description: "Comprehensive reporting and analytics dashboard providing insights into spending patterns and expense optimization.",
-                color: "from-blue-500 to-cyan-500",
-                bgColor: "from-slate-800/80 to-slate-700/80"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                className="group relative p-8 rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-sm hover:backdrop-blur-xl transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/10"
-                variants={fadeInUp}
-                whileHover={{ y: -10 }}
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgColor} rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                <div className="relative z-10">
-                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.color} text-white mb-6 shadow-lg`}>
-                    <feature.icon className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
-                  <p className="text-slate-300 leading-relaxed">{feature.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Enterprise Pricing Section */}
-      <section className="py-24 bg-gradient-to-br from-slate-800/50 to-slate-900/50 relative z-10">
-        <div className="container mx-auto px-4 md:px-6">
-          <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Enterprise
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
-                Pricing Plans
-              </span>
-            </h2>
-            <p className="max-w-2xl mx-auto text-xl text-slate-300">
-              Scalable solutions designed for businesses of all sizes. No hidden fees, enterprise-grade support included.
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-          >
-            {[
-              {
-                name: "Professional",
-                price: "₹299",
-                description: "Perfect for growing businesses",
-                features: ["50 Scans per month", "Advanced OCR processing", "30-day data retention", "Email support", "Basic analytics"],
-                buttonText: "Start Professional",
-                buttonVariant: "outline" as const,
-                popular: false
-              },
-              {
-                name: "Enterprise",
-                price: "₹599",
-                description: "For established organizations",
-                features: ["300 Scans per month", "AI-powered analysis", "Unlimited retention", "Priority support", "Advanced analytics", "Custom integrations"],
-                buttonText: "Get Enterprise",
-                buttonVariant: "default" as const,
-                popular: true
-              },
-              {
-                name: "Custom",
-                price: "Contact",
-                description: "Tailored enterprise solutions",
-                features: ["Unlimited processing", "Custom AI models", "Dedicated support", "White-label options", "API access", "SLA guarantees"],
-                buttonText: "Contact Sales",
-                buttonVariant: "outline" as const,
-                popular: false
-              }
-            ].map((plan, index) => (
-              <motion.div
-                key={index}
-                className={`relative p-8 rounded-2xl border-2 transition-all duration-500 hover:scale-105 ${
-                  plan.popular 
-                    ? 'border-blue-500 bg-gradient-to-br from-slate-800 to-slate-700 shadow-2xl shadow-blue-500/20' 
-                    : 'border-slate-700 bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-sm'
-                }`}
-                variants={fadeInUp}
-                whileHover={{ y: -10 }}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
-                      Most Popular
-                    </div>
-                  </div>
-                )}
-                
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
-                  <p className="text-slate-400 mb-6">{plan.description}</p>
-                  <div className="flex items-baseline justify-center">
-                    <span className="text-5xl font-bold text-white">{plan.price}</span>
-                    {plan.price !== "Contact" && (
-                      <span className="text-slate-400 ml-2">/month</span>
-                    )}
-                  </div>
-                </div>
-
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center">
-                      <Check className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" />
-                      <span className="text-slate-300">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Link href={plan.name === "Custom" ? "/contact" : "/manage-plans"}>
-                  <Button 
-                    className={`w-full py-3 text-lg font-semibold rounded-xl transition-all duration-300 ${
-                      plan.popular 
-                        ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl' 
-                        : 'border-2 hover:bg-slate-700 hover:border-slate-500 text-slate-300'
-                    }`}
-                    variant={plan.buttonVariant}
-                  >
-                    {plan.buttonText}
-                  </Button>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Enterprise CTA Section */}
-      <section className="py-24 relative z-10">
-        <div className="container mx-auto px-4 md:px-6">
-          <motion.div 
-            className="text-center max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Ready to Transform Your
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
-                Expense Management?
-              </span>
-            </h2>
-            <p className="text-xl text-slate-300 mb-8">
-              Join thousands of enterprises that trust our platform for their document processing needs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Link href="/receipts">
-                <Button className="px-12 py-4 text-xl font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 border border-blue-500/20">
-                  Start Processing Today
-                  <ArrowRight className="w-6 h-6 ml-3" />
-                </Button>
-              </Link>
-              <Button variant="outline" size="xl" className="px-12 py-4 text-xl font-semibold border-2 border-slate-600 text-slate-300 hover:bg-slate-800 hover:border-slate-500 rounded-xl transition-all duration-300 backdrop-blur-sm">
-                Schedule Demo
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Professional Footer */}
-      <footer className="border-t border-slate-700/50 bg-slate-900/80 backdrop-blur-sm relative z-10">
-        <div className="container mx-auto px-4 py-12 md:px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-3 mb-6 md:mb-0">
-              <div className="p-2 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg">
-                <Shield className="h-6 w-6 text-white" />
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="section-label">Upload</p>
+                <h2 className="mt-1 text-lg font-semibold text-slate-950">Add a receipt</h2>
               </div>
-              <span className="text-2xl font-bold text-white">
-                RetailEdge
-              </span>
+              <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
+                <Shield className="h-3.5 w-3.5" />
+                Secure
+              </div>
             </div>
-            <div className="text-center md:text-right">
-              <p className="text-slate-300 mb-2">
-                Enterprise-grade receipt processing platform
-              </p>
-              <p className="text-sm text-slate-500">
-                © 2024 RetailEdge. All rights reserved.
-              </p>
-            </div>
-          </div>
+            <PDFDropzone />
+          </motion.div>
         </div>
-      </footer>
+
+        <div className="mt-8 grid gap-3 md:grid-cols-3">
+          {[
+            "Upload a PDF receipt",
+            "Extract merchant, totals, and items",
+            "Review the saved record in Convex",
+          ].map((item) => (
+            <div key={item} className="surface-card p-4 text-sm text-slate-600">
+              <Check className="mb-2 h-4 w-4 text-slate-400" />
+              {item}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+          <motion.section
+            variants={fadeInUp}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, amount: 0.35 }}
+            className="surface-card p-6 md:p-8"
+          >
+            <p className="section-label">Product highlights</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+              Built to feel like a polished app, not a form.
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+              The layout now uses more space, stronger hierarchy, and motion that guides the eye from upload to review.
+            </p>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {[
+                {
+                  icon: Receipt,
+                  title: "Receipt workspace",
+                  copy: "An organized place to upload, inspect, and revisit saved documents.",
+                },
+                {
+                  icon: Clock3,
+                  title: "Live status",
+                  copy: "The list updates as receipts move from pending to processed.",
+                },
+                {
+                  icon: BarChart3,
+                  title: "Readable detail",
+                  copy: "Summary, totals, and items are grouped in an easy flow.",
+                },
+                {
+                  icon: UploadCloud,
+                  title: "Fast entry",
+                  copy: "The upload card stays prominent while the rest of the page gives it context.",
+                },
+              ].map((item, index) => (
+                <motion.div
+                  key={item.title}
+                  className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.35, delay: index * 0.06 }}
+                >
+                  <item.icon className="h-5 w-5 text-slate-900" />
+                  <h3 className="mt-3 font-semibold text-slate-950">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">{item.copy}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+
+          <motion.section
+            variants={fadeInUp}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, amount: 0.35 }}
+            className="relative overflow-hidden rounded-[2rem] bg-slate-950 p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.22)] md:p-8"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.14),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(96,165,250,0.18),transparent_30%)]" />
+            <div className="relative">
+              <p className="text-sm uppercase tracking-[0.24em] text-white/50">Scroll story</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
+                A page that keeps going and feels worth exploring.
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-white/70">
+                The landing page now continues below the fold with layered sections, clear structure, and a dark visual break so the header’s color shift feels natural.
+              </p>
+
+              <div className="mt-6 space-y-3">
+                {[
+                  "Deliberate scrolling rhythm",
+                  "Layered cards and clear hierarchy",
+                  "Responsive layout from mobile to desktop",
+                  "A visual break before the next section",
+                ].map((item, index) => (
+                  <motion.div
+                    key={item}
+                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90 backdrop-blur-sm"
+                    initial={{ opacity: 0, x: 14 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ duration: 0.35, delay: index * 0.06 }}
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10">
+                      <ArrowUpRight className="h-4 w-4" />
+                    </div>
+                    {item}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.section>
+        </div>
+
+        <div className="mt-10 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+          <motion.section
+            variants={fadeInUp}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, amount: 0.3 }}
+            className="rounded-[2rem] bg-slate-950 p-6 text-white md:p-8"
+          >
+            <p className="text-sm uppercase tracking-[0.24em] text-white/50">Workflow</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">
+              The review flow stays calm from start to finish.
+            </h2>
+            <div className="mt-6 space-y-4">
+              {[
+                {
+                  step: "01",
+                  title: "Upload a PDF",
+                  copy: "Drop a receipt into the workspace or choose one manually.",
+                },
+                {
+                  step: "02",
+                  title: "Review the record",
+                  copy: "Open the receipt page and see the summary, the extracted fields, and the item table.",
+                },
+                {
+                  step: "03",
+                  title: "Clear history",
+                  copy: "Start fresh any time with a single action from the receipts list.",
+                },
+              ].map((item, index) => (
+                <motion.div
+                  key={item.step}
+                  className="flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-4"
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.35, delay: index * 0.07 }}
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-semibold text-slate-950">
+                    {item.step}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">{item.title}</h3>
+                    <p className="mt-1 text-sm leading-6 text-white/70">{item.copy}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+
+          <motion.section
+            variants={fadeInUp}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, amount: 0.3 }}
+            className="surface-card p-6 md:p-8"
+          >
+            <p className="section-label">More to explore</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+              The page is now long enough to feel like a full website.
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              More vertical space means the header has a clear scroll state change, the upload section has room to breathe, and the app feels deliberate instead of cramped.
+            </p>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {[
+                "Scroll-aware header color shift",
+                "Balanced spacing across the page",
+                "Subtle motion on each section",
+                "A clearer story from top to bottom",
+              ].map((item, index) => (
+                <motion.div
+                  key={item}
+                  className="rounded-2xl border border-slate-200 bg-white p-4"
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                >
+                  <BadgeCheck className="h-4 w-4 text-emerald-500" />
+                  <p className="mt-2 text-sm leading-6 text-slate-700">{item}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+        </div>
+      </section>
     </div>
   );
 }
