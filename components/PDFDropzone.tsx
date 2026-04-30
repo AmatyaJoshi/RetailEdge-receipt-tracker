@@ -2,15 +2,9 @@
 
 import { uploadPDF } from "@/actions/uploadPDF";
 import { useUser } from "@clerk/clerk-react";
-import {
-    DndContext,
-    PointerSensor,
-    useSensor,
-    useSensors,
-} from "@dnd-kit/core"
 import { Button } from "./ui/button";
 import { useSchematicEntitlement } from "@schematichq/schematic-react";
-import { AlertCircle, CheckCircle, CloudUpload, FileText, Database, Cpu } from "lucide-react";
+import { AlertCircle, CheckCircle, CloudUpload, FileText, Database } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,11 +21,6 @@ function PDFDropzone() {
         featureUsageExceeded,
         featureAllocation
     } = useSchematicEntitlement("scans")
-
-    // Initialize sensors
-    const sensors = useSensors(
-        useSensor(PointerSensor)
-    );
 
     const handleUpload = useCallback(async (files: FileList | File[]) => {
         if (!user) {
@@ -112,13 +101,13 @@ function PDFDropzone() {
             return;
         }
 
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            handleUpload(e.dataTransfer.files);
-        }
-
         if (featureUsageExceeded) {
             alert("You have exceeded your scan limit");
+            return;
+        }
 
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            handleUpload(e.dataTransfer.files);
         }
     }, [user, handleUpload, featureUsageExceeded]);
 
@@ -137,104 +126,42 @@ function PDFDropzone() {
     const canUpload = isUserSignedIn && isFeatureEnabled;
 
     return (
-        <DndContext sensors={sensors}>
-            <div className="w-full max-w-3xl mx-auto">
+        <div className="w-full">
                 <motion.div
                     onDragOver={canUpload ? handleDragOver : undefined}
                     onDragLeave={canUpload ? handleDragLeave : undefined}
                     onDrop={canUpload ? handleDrop : (e) => e.preventDefault()}
-                    className={`relative border-2 border-dashed rounded-2xl p-12 text-center 
-                    transition-all duration-300 group cursor-pointer ${
-                        isDraggingOver 
-                            ? "border-blue-500 bg-blue-500/10 scale-105 shadow-2xl shadow-blue-500/20" 
-                            : "border-slate-600 hover:border-blue-400 hover:bg-slate-800/30"
-                    } ${!canUpload ? "opacity-70 cursor-not-allowed" : ""}`}
-                    whileHover={canUpload ? { scale: 1.02 } : {}}
-                    whileTap={canUpload ? { scale: 0.98 } : {}}
+                    className={`rounded-2xl border border-dashed p-6 text-center transition-colors ${
+                        isDraggingOver ? "border-slate-900 bg-slate-50" : "border-slate-200 hover:border-slate-300"
+                    } ${!canUpload ? "opacity-60" : ""}`}
+                    whileHover={canUpload ? { y: -2 } : {}}
                 >
-                    {/* Background gradient effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-cyan-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
-                    {/* Animated border glow */}
-                    <div className={`absolute inset-0 rounded-2xl transition-all duration-500 ${
-                        isDraggingOver 
-                            ? 'ring-4 ring-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.3)]' 
-                            : 'ring-0'
-                    }`} />
-
                     <div className="relative z-10">
                         {isUploading ? (
-                            <motion.div 
-                                className="flex flex-col items-center"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                <div className="relative mb-6">
-                                    <div className="w-20 h-20 border-4 border-slate-600 rounded-full" />
-                                    <div className="absolute inset-0 w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                                </div>
-                                <motion.p 
-                                    className="text-lg font-medium text-white"
-                                    animate={{ opacity: [0.7, 1, 0.7] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                >
-                                    Processing Document...
-                                </motion.p>
-                                <p className="text-sm text-slate-400 mt-2">
-                                    Our AI is extracting and analyzing your receipt data
-                                </p>
+                            <motion.div className="flex flex-col items-center py-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <div className="mb-4 h-10 w-10 rounded-full border-2 border-slate-200 border-t-slate-900 animate-spin" />
+                                <p className="text-sm font-medium text-slate-950">Processing receipt</p>
+                                <p className="mt-1 text-sm text-slate-500">Extracting text and saving the result.</p>
                             </motion.div>
                         ) : !isUserSignedIn ? (
-                            <motion.div 
-                                className="flex flex-col items-center"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                <div className="relative mb-6">
-                                    <div className="w-24 h-24 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl flex items-center justify-center border border-slate-600">
-                                        <Database className="h-12 w-12 text-slate-400" />
-                                    </div>
+                            <motion.div className="flex flex-col items-center py-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                    <Database className="h-8 w-8 text-slate-500" />
                                 </div>
-                                <h3 className="text-xl font-semibold text-white mb-2">
-                                    Authentication Required
-                                </h3>
-                                <p className="text-slate-400 max-w-sm">
-                                    Please sign in to access our enterprise document processing platform
-                                </p>
+                                <h3 className="text-base font-semibold text-slate-950">Sign in to upload</h3>
+                                <p className="mt-1 max-w-sm text-sm text-slate-500">Upload a PDF receipt and let the system extract the details automatically.</p>
                             </motion.div>
                         ) : (
-                            <motion.div 
-                                className="flex flex-col items-center"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                {/* Professional icon with gradient background */}
-                                <div className="relative mb-6">
-                                    <div className="w-28 h-28 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-3xl flex items-center justify-center shadow-2xl group-hover:shadow-blue-500/25 transition-all duration-300 border border-blue-500/20">
-                                        <FileText className="h-14 w-14 text-white" />
-                                    </div>
-                                    {/* Subtle processing indicator */}
-                                    <motion.div 
-                                        className="absolute -top-2 -right-2 w-6 h-6 bg-blue-400 rounded-full flex items-center justify-center"
-                                        animate={{ 
-                                            scale: [1, 1.2, 1],
-                                            opacity: [0.8, 1, 0.8]
-                                        }}
-                                        transition={{ duration: 2, repeat: Infinity }}
-                                    >
-                                        <Cpu className="h-3 w-3 text-white" />
-                                    </motion.div>
+                            <motion.div className="flex flex-col items-center py-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <div className="mb-4 rounded-2xl bg-slate-950 p-4 text-white shadow-sm">
+                                    <FileText className="h-8 w-8" />
                                 </div>
 
-                                <h3 className="text-2xl font-bold text-white mb-3">
-                                    Document Processing Zone
+                                <h3 className="text-lg font-semibold text-slate-950">
+                                    Drop a PDF here
                                 </h3>
-                                <p className="text-slate-300 max-w-md mb-6 leading-relaxed">
-                                    Upload your receipts for instant AI-powered data extraction, categorization, and analysis. 
-                                    Enterprise-grade processing with 99.9% accuracy.
+                                <p className="mt-1 max-w-md text-sm text-slate-500">
+                                    Or choose a file to upload. We support PDF receipts only.
                                 </p>
 
                                 <input
@@ -247,26 +174,16 @@ function PDFDropzone() {
                                 />
                                 
                                 <Button
-                                    className={`px-8 py-3 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 ${
-                                        isFeatureEnabled 
-                                            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl border border-blue-500/20' 
-                                            : 'bg-gradient-to-r from-slate-600 to-slate-700 text-white cursor-not-allowed opacity-70'
-                                    }`}
+                                    className="mt-5 rounded-full bg-slate-950 px-5 py-2.5 text-white hover:bg-slate-800"
                                     disabled={!isFeatureEnabled}
                                     onClick={triggerFileInput}
                                 >
-                                    {isFeatureEnabled ? (
-                                        <span className="flex items-center">
-                                            <CloudUpload className="h-5 w-5 mr-2" />
-                                            Process Documents
-                                        </span>
-                                    ) : (
-                                        "Upgrade Required"
-                                    )}
+                                    <CloudUpload className="mr-2 h-4 w-4" />
+                                    {isFeatureEnabled ? "Choose PDF" : "Upgrade required"}
                                 </Button>
 
-                                <p className="text-xs text-slate-500 mt-4">
-                                    Supports PDF files up to 25MB • Enterprise-grade security
+                                <p className="mt-3 text-xs text-slate-400">
+                                    PDF only · secure upload
                                 </p>
                             </motion.div>
                         )}
@@ -283,12 +200,12 @@ function PDFDropzone() {
                             exit={{ opacity: 0, y: -20, scale: 0.95 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <div className="flex items-center p-4 bg-gradient-to-r from-red-900/20 to-red-800/20 border border-red-700/50 rounded-xl text-red-300 shadow-lg">
+                            <div className="flex items-center rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
                                 <AlertCircle className="h-6 w-6 mr-3 flex-shrink-0" />
                                 <div>
                                     <p className="font-semibold">Processing Limit Reached</p>
                                     <p className="text-sm opacity-90">
-                                        You've used {featureAllocation} scans. Upgrade your plan to continue processing documents.
+                                        You&apos;ve used {featureAllocation} scans. Upgrade your plan to continue processing documents.
                                     </p>
                                 </div>
                             </div>
@@ -306,21 +223,21 @@ function PDFDropzone() {
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 shadow-lg">
-                                <h3 className="font-semibold text-white mb-3 flex items-center">
-                                    <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
+                            <div className="surface-card p-4 shadow-sm">
+                                <h3 className="mb-3 flex items-center font-semibold text-slate-950">
+                                    <CheckCircle className="mr-2 h-5 w-5 text-emerald-500" />
                                     Successfully Processed
                                 </h3>
                                 <ul className="space-y-2">
                                     {uploadedFiles.map((fileName, i) => (
                                         <motion.li 
                                             key={i} 
-                                            className="flex items-center text-sm text-slate-300"
+                                            className="flex items-center text-sm text-slate-600"
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: i * 0.1 }}
                                         >
-                                            <div className="w-2 h-2 bg-green-400 rounded-full mr-3" />
+                                            <div className="mr-3 h-2 w-2 rounded-full bg-emerald-500" />
                                             {fileName}
                                         </motion.li>
                                     ))}
@@ -330,7 +247,6 @@ function PDFDropzone() {
                     )}
                 </AnimatePresence>
             </div>
-        </DndContext>
     );
 }
 

@@ -214,3 +214,26 @@ export const updateReceiptWithExtractedData = mutation({
         };
     },
 });
+
+// Mark a receipt as failed so the UI can surface the issue without losing the upload
+export const updateReceiptProcessingError = mutation({
+    args: {
+        id: v.id("receipts"),
+        errorMessage: v.string(),
+        rawExtractedData: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        const receipt = await ctx.db.get(args.id);
+        if (!receipt) {
+            throw new Error("Unauthorized: Receipt not found.");
+        }
+
+        await ctx.db.patch(args.id, {
+            status: "error",
+            receiptSummary: args.errorMessage,
+            rawExtractedData: args.rawExtractedData,
+        });
+
+        return true;
+    },
+});

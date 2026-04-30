@@ -4,13 +4,10 @@ import Link from "next/link";
 import { Shield, Menu, X } from "lucide-react";
 import { SignedIn, SignInButton, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function Header() {
-    const pathname = usePathname();
-    const isHomePage = pathname === '/';
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     
@@ -31,8 +28,8 @@ function Header() {
         <motion.header 
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
                 isScrolled 
-                    ? 'bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 shadow-2xl' 
-                    : 'bg-transparent'
+                    ? 'bg-slate-950/90 text-white backdrop-blur-xl border-b border-white/10 shadow-[0_12px_40px_rgba(15,23,42,0.22)]' 
+                    : 'bg-transparent text-slate-950'
             }`}
             initial={{ y: -100 }}
             animate={{ y: 0 }}
@@ -43,13 +40,15 @@ function Header() {
                     {/* Logo */}
                     <Link href={'/'} className="flex items-center group">
                         <motion.div 
-                            className="p-2 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-300"
+                            className={`p-2 rounded-xl mr-3 transition-transform duration-300 group-hover:scale-105 ${
+                                isScrolled ? "bg-white text-slate-950" : "bg-slate-950 text-white"
+                            }`}
                             whileHover={{ rotate: 5 }}
                         >
-                            <Shield className="w-6 h-6 text-white" />
+                            <Shield className="w-6 h-6" />
                         </motion.div>
                         <motion.h1 
-                            className="text-xl md:text-2xl font-bold text-white"
+                            className={`text-xl md:text-2xl font-semibold ${isScrolled ? "text-white" : "text-slate-950"}`}
                             whileHover={{ scale: 1.05 }}
                             transition={{ type: "spring", stiffness: 400 }}
                         >
@@ -58,39 +57,43 @@ function Header() {
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-6">
+                    <div className="hidden md:flex items-center space-x-3">
+                        <Link href={'/receipts'}>
+                            <Button 
+                                variant={'outline'} 
+                                className={`rounded-full px-5 py-2 ${
+                                    isScrolled
+                                        ? "border-white/15 bg-white/10 text-white hover:bg-white/15 hover:text-white"
+                                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+                                }`}
+                            >
+                                My Receipts
+                            </Button>
+                        </Link>
+
+                        <Link href={'/manage-plan'}>
+                            <Button className={`rounded-full px-5 py-2 ${isScrolled ? "bg-white text-slate-950 hover:bg-slate-100" : "bg-slate-950 text-white hover:bg-slate-800"}`}>
+                                Manage Plan
+                            </Button>
+                        </Link>
+
                         <SignedIn>
-                            <Link href={'/receipts'}>
-                                <Button 
-                                    variant={'outline'} 
-                                    className="border-2 border-slate-600 text-slate-300 hover:bg-slate-800 hover:border-slate-500 rounded-xl px-6 py-2 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
-                                >
-                                    My Receipts
-                                </Button>
-                            </Link>
-
-                            <Link href={'/manage-plan'}>
-                                <Button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-blue-500/20">
-                                    Manage Plan
-                                </Button>
-                            </Link>
-
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                             >
                                 <UserButton 
-                                    appearance={{
-                                        elements: {
-                                            avatarBox: "w-10 h-10 rounded-xl border-2 border-slate-600"
-                                        }
-                                    }}
-                                />
+                                appearance={{
+                                    elements: {
+                                        avatarBox: `w-10 h-10 rounded-full border ${isScrolled ? "border-white/15" : "border-slate-200"}`
+                                    }
+                                }}
+                            />
                             </motion.div>
                         </SignedIn>
                         <SignedOut>
                             <SignInButton mode="modal">
-                                <Button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-blue-500/20">
+                                <Button className={`rounded-full px-5 py-2 ${isScrolled ? "bg-white text-slate-950 hover:bg-slate-100" : "bg-slate-950 text-white hover:bg-slate-800"}`}>
                                     Get Started
                                 </Button>
                             </SignInButton>
@@ -99,7 +102,9 @@ function Header() {
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="md:hidden p-2 rounded-lg hover:bg-slate-800 transition-colors duration-200"
+                        className={`md:hidden p-2 rounded-lg transition-colors duration-200 ${
+                            isScrolled ? "hover:bg-white/10" : "hover:bg-slate-100"
+                        }`}
                         onClick={toggleMobileMenu}
                         aria-label="Toggle mobile menu"
                     >
@@ -112,7 +117,7 @@ function Header() {
                                     exit={{ rotate: 90, opacity: 0 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    <X className="w-6 h-6 text-slate-300" />
+                                    <X className={`w-6 h-6 ${isScrolled ? "text-white" : "text-slate-700"}`} />
                                 </motion.div>
                             ) : (
                                 <motion.div
@@ -122,7 +127,7 @@ function Header() {
                                     exit={{ rotate: -90, opacity: 0 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    <Menu className="w-6 h-6 text-slate-300" />
+                                    <Menu className={`w-6 h-6 ${isScrolled ? "text-white" : "text-slate-700"}`} />
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -133,46 +138,54 @@ function Header() {
                 <AnimatePresence>
                     {isMobileMenuOpen && (
                         <motion.div
-                            className="md:hidden border-t border-slate-700/50 bg-slate-900/95 backdrop-blur-xl"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
+                            className={`md:hidden border-t backdrop-blur ${
+                                isScrolled
+                                    ? "border-white/10 bg-slate-950/95 text-white"
+                                    : "border-slate-200 bg-white/95 text-slate-950"
+                            }`}
+                            initial={{ opacity: 0, scaleY: 0.96, transformOrigin: "top" }}
+                            animate={{ opacity: 1, scaleY: 1, transformOrigin: "top" }}
+                            exit={{ opacity: 0, scaleY: 0.96, transformOrigin: "top" }}
                             transition={{ duration: 0.3, ease: "easeInOut" }}
                         >
                             <div className="py-6 space-y-4">
+                                <div className="space-y-3">
+                                    <Link href={'/receipts'} onClick={() => setIsMobileMenuOpen(false)}>
+                                        <Button 
+                                            variant={'outline'} 
+                                            className={`w-full justify-start rounded-xl px-6 py-3 text-left ${
+                                                isScrolled
+                                                    ? "border-white/15 bg-white/10 text-white hover:bg-white/15"
+                                                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                                            }`}
+                                        >
+                                            My Receipts
+                                        </Button>
+                                    </Link>
+
+                                    <Link href={'/manage-plan'} onClick={() => setIsMobileMenuOpen(false)}>
+                                        <Button className={`w-full justify-start rounded-xl px-6 py-3 text-left ${isScrolled ? "bg-white text-slate-950 hover:bg-slate-100" : "bg-slate-950 text-white hover:bg-slate-800"}`}>
+                                            Manage Plan
+                                        </Button>
+                                    </Link>
+                                </div>
+
                                 <SignedIn>
-                                    <div className="space-y-3">
-                                        <Link href={'/receipts'} onClick={() => setIsMobileMenuOpen(false)}>
-                                            <Button 
-                                                variant={'outline'} 
-                                                className="w-full justify-start border-2 border-slate-600 text-slate-300 hover:bg-slate-800 hover:border-slate-500 rounded-xl px-6 py-3 text-left backdrop-blur-sm"
-                                            >
-                                                My Receipts
-                                            </Button>
-                                        </Link>
-
-                                        <Link href={'/manage-plan'} onClick={() => setIsMobileMenuOpen(false)}>
-                                            <Button className="w-full justify-start bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl px-6 py-3 text-left border border-blue-500/20">
-                                                Manage Plan
-                                            </Button>
-                                        </Link>
-
-                                        <div className="flex justify-center pt-4">
-                                            <UserButton 
-                                                appearance={{
-                                                    elements: {
-                                                        avatarBox: "w-12 h-12 rounded-xl border-2 border-slate-600"
-                                                    }
-                                                }}
-                                            />
-                                        </div>
+                                    <div className="flex justify-center pt-4">
+                                        <UserButton 
+                                            appearance={{
+                                                elements: {
+                                                    avatarBox: "w-12 h-12 rounded-full border border-slate-200"
+                                                }
+                                            }}
+                                        />
                                     </div>
                                 </SignedIn>
                                 <SignedOut>
                                     <div className="pt-4">
                                         <SignInButton mode="modal">
                                             <Button 
-                                                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20"
+                                                className={`w-full rounded-xl px-6 py-3 ${isScrolled ? "bg-white text-slate-950 hover:bg-slate-100" : "bg-slate-950 text-white hover:bg-slate-800"}`}
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                             >
                                                 Get Started

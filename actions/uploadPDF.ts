@@ -48,6 +48,7 @@ export async function uploadPDF(formData: FormData) {
         // Upload the file to Convex Storage
         const uploadResponse = await fetch(uploadUrl, {
             method: "POST",
+            cache: "no-store",
             headers: {
                 "Content-Type": file.type,
             },
