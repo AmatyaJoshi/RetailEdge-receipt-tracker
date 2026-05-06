@@ -8,7 +8,7 @@ function getOpenRouterConfig() {
 
     return {
         apiKey,
-        model: process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        model: process.env.OPENROUTER_MODEL || "baidu/qianfan-ocr-fast:free",
         httpReferer: process.env.OPENROUTER_HTTP_REFERER || "http://localhost:3000",
         appTitle: process.env.OPENROUTER_APP_TITLE || "receipt-tracker",
     };
